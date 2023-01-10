@@ -1,3 +1,4 @@
+-- Made by Sarlex --
 local player = game:GetService("Players").LocalPlayer
 local plrGui = player.PlayerGui
 local tweenService = game:GetService("TweenService")
