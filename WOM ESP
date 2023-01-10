@@ -37,7 +37,7 @@ noticesLabel.Parent = mainFrame
 noticesLabel.Text = ""
 noticesLabel.Position = UDim2.fromScale(0,0)
 noticesLabel.Font = Enum.Font.Code
-noticesLabel.Size = UDim2.fromScale(1,0.075)
+noticesLabel.Size = UDim2.fromScale(1,0.15)
 noticesLabel.BackgroundColor3 = Color3.new(0, 0, 0)
 noticesLabel.BorderSizePixel = 0
 noticesLabel.TextColor3 = Color3.new(1, 0, 0.0156863)
@@ -107,26 +107,43 @@ uiCons.Parent = trashButton
 trashButton.Size = UDim2.fromScale(0.075,0.075)
 trashButton.Position = UDim2.fromScale(1,1)
 trashButton.MouseButton1Click:Connect(function()
-	if currentIndicator then
-		currentIndicator:Destroy()
+	if #deletingArray ~= 0 then
+		deleteArray()
 	end
 end)
 
 local function createIndicator(obj)
-	if currentIndicator then currentIndicator:Destroy() end
+	if #deletingArray ~= 0 then deleteArray() end
 	local hgl = Instance.new("Highlight")
 	hgl.FillTransparency = 1
 	hgl.OutlineTransparency = 0.25
 	hgl.OutlineColor = Color3.new(1, 0, 0)
 	hgl.Parent = obj
 	hgl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-	return hgl
+	deletingArray[1] = hgl
+	local billboardGUI = Instance.new("BillboardGui")
+	billboardGUI.Parent = obj
+	billboardGUI.Adornee = obj
+	billboardGUI.AlwaysOnTop = true
+	billboardGUI.Size = UDim2.fromOffset(100,30)
+	billboardGUI.ExtentsOffsetWorldSpace = Vector3.new(0,20,0)
+	billboardGUI.ZIndexBehavior = "Global"
+	deletingArray[2] = billboardGUI
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Parent = billboardGUI
+	textLabel.Size = UDim2.fromScale(1,1)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = tostring(obj.Name)
+	textLabel.Font = Enum.Font.SourceSansBold
+	textLabel.TextColor3 = Color3.new(1, 1, 1)
+	textLabel.TextStrokeColor3 = Color3.new(0.435294, 0.435294, 0.435294)
+	textLabel.TextScaled = true
 end
 
 local function showLocation(btn)
 	if npcFolder:FindFirstChild(btn:GetAttribute("Obj")) then
 		local npc = npcFolder:FindFirstChild(btn:GetAttribute("Obj"))
-		currentIndicator = createIndicator(npc)
+		createIndicator(npc)
 	else
 		writeNotice(btn:GetAttribute("Obj").." is not spawned!")
 	end
