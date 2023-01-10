@@ -4,7 +4,15 @@ local tweenService = game:GetService("TweenService")
 local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad)
 local npcFolder = game:GetService("Workspace"):WaitForChild("NPCs")
 local deletingArray = {}
-local currentIndicator
+local playerHglArray = {}
+local players = game:GetService("Players")
+local highlightConnection = nil
+
+local function clearHighlights()
+	for i,v in pairs(playerHglArray) do
+		v:Destroy()
+	end
+end
 
 local function deleteArray()
 	for i,v in pairs(deletingArray) do
@@ -12,6 +20,14 @@ local function deleteArray()
 	end
 end
 
+local function cratePlayerHighlight()
+	local hgl = Instance.new("Highlight")
+	hgl.FillTransparency = 1
+	hgl.OutlineTransparency = 0.25
+	hgl.OutlineColor = Color3.new(1, 0.917647, 0)
+	hgl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+	return hgl
+end
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = plrGui
@@ -49,6 +65,16 @@ local function writeNotice(str)
 	noticesLabel.Text = ""
 end
 
+local PlayersLabel = Instance.new("TextLabel")
+PlayersLabel.Parent = mainFrame
+PlayersLabel.Text = "Players"
+PlayersLabel.Position = UDim2.fromScale(0.05,0.25)
+PlayersLabel.Font = Enum.Font.Code
+PlayersLabel.Size = UDim2.fromScale(0.25,0.15)
+PlayersLabel.BackgroundTransparency = 1
+PlayersLabel.TextColor3 = Color3.new(1, 0, 0.0156863)
+PlayersLabel.TextScaled = true
+
 local TheExiledLabel = Instance.new("TextLabel")
 TheExiledLabel.Parent = mainFrame
 TheExiledLabel.Text = "The Exiled"
@@ -81,6 +107,17 @@ findExiledButton.TextColor3 = Color3.new(1, 0, 0.0156863)
 findExiledButton.TextScaled = true
 findExiledButton:SetAttribute("Obj", "The Exiled")
 
+local showPlayersButton = Instance.new("TextButton")
+showPlayersButton.Parent = mainFrame
+showPlayersButton.Text = "Show"
+showPlayersButton.Position = UDim2.fromScale(0.4,0.25)
+showPlayersButton.Font = Enum.Font.Code
+showPlayersButton.Size = UDim2.fromScale(0.25,0.15)
+showPlayersButton.BackgroundColor3 = Color3.new(0, 0, 0)
+showPlayersButton.BorderColor3 = Color3.new(1, 0, 0)
+showPlayersButton.TextColor3 = Color3.new(1, 0, 0.0156863)
+showPlayersButton.TextScaled = true
+
 local findMinataurButton = Instance.new("TextButton")
 findMinataurButton.Parent = mainFrame
 findMinataurButton.Text = "Find"
@@ -110,6 +147,10 @@ trashButton.MouseButton1Click:Connect(function()
 	if #deletingArray ~= 0 then
 		deleteArray()
 	end
+	if highlightConnection then
+		highlightConnection:Disconnect()
+	end
+	clearHighlights()
 end)
 
 local function createIndicator(obj)
@@ -126,7 +167,7 @@ local function createIndicator(obj)
 	billboardGUI.Adornee = obj
 	billboardGUI.AlwaysOnTop = true
 	billboardGUI.Size = UDim2.fromOffset(100,30)
-	billboardGUI.ExtentsOffsetWorldSpace = Vector3.new(0,5,0)
+	billboardGUI.ExtentsOffsetWorldSpace = Vector3.new(0,20,0)
 	billboardGUI.ZIndexBehavior = "Global"
 	deletingArray[2] = billboardGUI
 	local textLabel = Instance.new("TextLabel")
@@ -164,5 +205,31 @@ showButton.MouseButton1Click:Connect(function()
 	elseif showButton.Text == "Hide" then
 		showButton.Text = "Show"
 		tweenService:Create(mainFrame,tweenInfo, {Position = UDim2.fromScale(-0.5,0.1)}):Play()
+	end
+end)
+
+local function showPlayerAdded(model)
+	if players:FindFirstChild(model.Name) and model.Name ~= player.Name then
+		local higlit = cratePlayerHighlight()
+		higlit.Parent = model
+		table.insert(playerHglArray, higlit)
+	end
+end
+
+showPlayersButton.MouseButton1Click:Connect(function()
+	if showPlayersButton.Text == "Show" then
+		showPlayersButton.Text = "Hide"
+		highlightConnection = game:GetService("Workspace").ChildAdded:Connect(showPlayerAdded)
+		for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
+			if players:FindFirstChild(v.Name) and v.Name ~= player.Name then
+				local higlit = cratePlayerHighlight()
+				higlit.Parent = v
+				table.insert(playerHglArray, higlit)
+			end
+		end
+	elseif showPlayersButton.Text == "Hide" then
+		showPlayersButton.Text = "Show"
+		highlightConnection:Disconnect()
+		clearHighlights()
 	end
 end)
