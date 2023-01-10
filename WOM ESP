@@ -42,6 +42,7 @@ end
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = plrGui
+screenGui.ResetOnSpawn = false
 
 local showButton = Instance.new("TextButton")
 showButton.Text = "Show"
