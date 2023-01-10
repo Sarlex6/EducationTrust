@@ -1,0 +1,151 @@
+local player = game:GetService("Players").LocalPlayer
+local plrGui = player.PlayerGui
+local tweenService = game:GetService("TweenService")
+local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad)
+local npcFolder = game:GetService("Workspace"):WaitForChild("NPCs")
+local deletingArray = {}
+local currentIndicator
+
+local function deleteArray()
+	for i,v in pairs(deletingArray) do
+		v:Destroy()
+	end
+end
+
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = plrGui
+
+local showButton = Instance.new("TextButton")
+showButton.Text = "Show"
+showButton.Parent = screenGui
+showButton.Position = UDim2.fromScale(0,0.2)
+showButton.Size = UDim2.fromScale(0.025,0.025)
+showButton.BorderColor3 = Color3.new(0.67451, 0, 0)
+showButton.BackgroundColor3 = Color3.new(0, 0, 0)
+showButton.TextColor3 = Color3.new(1, 1, 1)
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Parent = screenGui
+mainFrame.Position = UDim2.fromScale(-0.5,0.1)
+mainFrame.Size = UDim2.fromScale(0.2,0.2)
+mainFrame.BorderColor3 = Color3.new(0.67451, 0, 0)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+
+local noticesLabel = Instance.new("TextLabel")
+noticesLabel.Parent = mainFrame
+noticesLabel.Text = ""
+noticesLabel.Position = UDim2.fromScale(0,0)
+noticesLabel.Font = Enum.Font.Code
+noticesLabel.Size = UDim2.fromScale(1,0.075)
+noticesLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+noticesLabel.BorderSizePixel = 0
+noticesLabel.TextColor3 = Color3.new(1, 0, 0.0156863)
+noticesLabel.TextScaled = true
+
+local function writeNotice(str)
+	noticesLabel.Text = str
+	task.wait(2)
+	noticesLabel.Text = ""
+end
+
+local TheExiledLabel = Instance.new("TextLabel")
+TheExiledLabel.Parent = mainFrame
+TheExiledLabel.Text = "The Exiled"
+TheExiledLabel.Position = UDim2.fromScale(0.05,0.5)
+TheExiledLabel.Font = Enum.Font.Code
+TheExiledLabel.Size = UDim2.fromScale(0.25,0.15)
+TheExiledLabel.BackgroundTransparency = 1
+TheExiledLabel.TextColor3 = Color3.new(1, 0, 0.0156863)
+TheExiledLabel.TextScaled = true
+
+local MinataurLabel = Instance.new("TextLabel")
+MinataurLabel.Parent = mainFrame
+MinataurLabel.Text = "Minotaur"
+MinataurLabel.Position = UDim2.fromScale(0.05,0.7)
+MinataurLabel.Font = Enum.Font.Code
+MinataurLabel.Size = UDim2.fromScale(0.25,0.15)
+MinataurLabel.BackgroundTransparency = 1
+MinataurLabel.TextColor3 = Color3.new(1, 0, 0.0156863)
+MinataurLabel.TextScaled = true
+
+local findExiledButton = Instance.new("TextButton")
+findExiledButton.Parent = mainFrame
+findExiledButton.Text = "Find"
+findExiledButton.Position = UDim2.fromScale(0.4,0.5)
+findExiledButton.Font = Enum.Font.Code
+findExiledButton.Size = UDim2.fromScale(0.25,0.15)
+findExiledButton.BackgroundColor3 = Color3.new(0, 0, 0)
+findExiledButton.BorderColor3 = Color3.new(1, 0, 0)
+findExiledButton.TextColor3 = Color3.new(1, 0, 0.0156863)
+findExiledButton.TextScaled = true
+findExiledButton:SetAttribute("Obj", "The Exiled")
+
+local findMinataurButton = Instance.new("TextButton")
+findMinataurButton.Parent = mainFrame
+findMinataurButton.Text = "Find"
+findMinataurButton.Position = UDim2.fromScale(0.4,0.7)
+findMinataurButton.Font = Enum.Font.Code
+findMinataurButton.Size = UDim2.fromScale(0.25,0.15)
+findMinataurButton.BackgroundColor3 = Color3.new(0, 0, 0)
+findMinataurButton.BorderColor3 = Color3.new(1, 0, 0)
+findMinataurButton.TextColor3 = Color3.new(1, 0, 0.0156863)
+findMinataurButton.TextScaled = true
+findMinataurButton:SetAttribute("Obj", "Minotaur")
+
+local trashButton = Instance.new("ImageButton")
+trashButton.Parent = mainFrame
+trashButton.Image = "rbxassetid://12113618398"
+trashButton.AnchorPoint = Vector2.new(1,1)
+trashButton.BackgroundColor3 = Color3.new(0, 0, 0)
+trashButton.BorderColor3 = Color3.new(1, 0, 0)
+local uiCons = Instance.new("UIAspectRatioConstraint")
+uiCons.DominantAxis = Enum.DominantAxis.Width
+uiCons.AspectRatio = 1
+uiCons.AspectType = Enum.AspectType.ScaleWithParentSize
+uiCons.Parent = trashButton
+trashButton.Size = UDim2.fromScale(0.075,0.075)
+trashButton.Position = UDim2.fromScale(1,1)
+trashButton.MouseButton1Click:Connect(function()
+	if currentIndicator then
+		currentIndicator:Destroy()
+	end
+end)
+
+local function createIndicator(obj)
+	if currentIndicator then currentIndicator:Destroy() end
+	local hgl = Instance.new("Highlight")
+	hgl.FillTransparency = 1
+	hgl.OutlineTransparency = 0.25
+	hgl.OutlineColor = Color3.new(1, 0, 0)
+	hgl.Parent = obj
+	hgl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+	return hgl
+end
+
+local function showLocation(btn)
+	if npcFolder:FindFirstChild(btn:GetAttribute("Obj")) then
+		local npc = npcFolder:FindFirstChild(btn:GetAttribute("Obj"))
+		currentIndicator = createIndicator(npc)
+	else
+		writeNotice(btn:GetAttribute("Obj").." is not spawned!")
+	end
+end
+
+findExiledButton.MouseButton1Click:Connect(function()
+	showLocation(findExiledButton)
+end)
+findMinataurButton.MouseButton1Click:Connect(function()
+	showLocation(findMinataurButton)
+end)
+
+showButton.MouseButton1Click:Connect(function()
+	if showButton.Text == "Show" then
+		showButton.Text = "Hide"
+		tweenService:Create(mainFrame,tweenInfo, {Position = UDim2.fromScale(0.05,0.1)}):Play()
+		
+	elseif showButton.Text == "Hide" then
+		showButton.Text = "Show"
+		tweenService:Create(mainFrame,tweenInfo, {Position = UDim2.fromScale(-0.5,0.1)}):Play()
+	end
+end)
