@@ -222,6 +222,7 @@ showButton.MouseButton1Click:Connect(function()
 end)
 
 local function showPlayerAdded(model)
+	task.wait(2)
 	if players:FindFirstChild(model.Name) and model.Name ~= player.Name then
 		local higlit = cratePlayerHighlight()
 		higlit.Parent = model
